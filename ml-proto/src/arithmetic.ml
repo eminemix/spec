@@ -51,7 +51,14 @@ struct
       | Neg -> Int.neg
       | Abs -> Int.abs
       | Not -> Int.lognot
-      | Clz -> fun i -> i  (* TODO *)
+      | Clz -> fun i ->
+        let open Int in
+        if i = zero then shift_left one (5 + (size / 64)) else
+        let rec loop j =
+          if logand i j = zero
+          then add one (loop (shift_right_logical j 1))
+          else zero
+        in loop (shift_left one (size - 1))
       | Ctz -> fun i ->
         let open Int in
         if i = zero then zero else
